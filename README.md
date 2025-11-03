@@ -161,3 +161,11 @@ vagrant ssh web -c "psql -h 192.168.56.4 -U admin_proyecto -d mi_proyecto -c 'SE
 - Cinco registros de ejemplo precargados
 - Permisos configurados para acceso remoto
 - Configurada para aceptar conexiones desde la red privada
+
+## Resultados esperados
+
+### Provisionamiento exitoso:
+https://files.catbox.moe/ddv29n.jpeg
+
+### Consulta info.php exitosa: 
+https://files.catbox.moe/sj2zts.jpeg
