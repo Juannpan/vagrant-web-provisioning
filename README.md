@@ -1,107 +1,157 @@
-# Taller Vagrant + Provisionamiento con Shell
+# Proyecto de Infraestructura Web con Vagrant
 
-## Pasos
-1. Clonar este repositorio.  
-2. Ejecutar `vagrant up` para levantar las máquinas.  
-3. Acceder a la máquina web en: http://192.168.56.10  
-4. Verificar `index.html` y `info.php`.  
+## Descripción General
 
-## Reto
-- Completar `provision-db.sh` para instalar PostgreSQL.  
-- Crear una base de datos y tabla.  
-- Conectar la página PHP a la base de datos y mostrar datos.  
+Este proyecto automatiza el despliegue de un entorno completo de desarrollo que incluye:
+
+- Servidor Web (Apache + PHP) en una máquina virtual
+- Servidor de Base de Datos (PostgreSQL) en otra máquina virtual
+- Aplicación Web con conexión a base de datos lista para usar
+
+## Requisitos Previos
+
+Antes de ejecutar el proyecto, asegúrate de tener instalado lo siguiente:
+
+- Vagrant
+- VirtualBox (u otro proveedor de virtualización compatible)
+- Conexión a Internet para descargar las boxes de Ubuntu
+
+## Estructura del Proyecto
+
+```
+proyecto/
+├── Vagrantfile              # Configuración de las máquinas virtuales
+├── provision-web.sh         # Script de provisionamiento del servidor web
+├── provision-db.sh          # Script de provisionamiento de la base de datos
+├── www/                     # Archivos de la aplicación web
+│   ├── index.php            # Página principal
+│   └── consulta-bd.php      # Formulario de conexión a BD
+└── README.md                # Este archivo
+```
+
+## Configuración y Ejecución
+
+### 1. Iniciar el entorno completo
+
+Ejecutar desde el directorio del proyecto:
+
+```bash
+vagrant up
+```
+
+Este comando automáticamente:
+
+- Descarga la imagen de Ubuntu 20.04 (focal64)
+- Crea dos máquinas virtuales: web y db
+- Ejecuta los scripts de provisionamiento en cada máquina
+
+### 2. Máquinas Virtuales Creadas
+
+| Máquina | IP            | Servicios         | Hostname |
+|----------|---------------|------------------|-----------|
+| web      | 192.168.56.3  | Apache + PHP     | web       |
+| db       | 192.168.56.4  | PostgreSQL       | db        |
+
+## Acceso a la Aplicación
+
+### Página Principal
+```
+http://192.168.56.3
+```
+
+### Formulario de Conexión a Base de Datos
+```
+http://192.168.56.3/consulta-bd.php
+```
+
+### Credenciales de Base de Datos
+
+- Servidor: 192.168.56.4
+- Base de datos: mi_proyecto
+- Usuario: admin_proyecto
+- Contraseña: ContraseñaSegura123
 
 ## Scripts de Provisionamiento
 
-### Orden de Ejecución
-Ejecutar los scripts en el siguiente orden:
+### provision-web.sh (Servidor Web)
 
-1. **provision-web.sh** - Servidor web  
-2. **provision-db.sh** - Base de datos  
-3. **setup-simple-table.sh** - Estructura de datos  
+Configura automáticamente:
 
-### Scripts Disponibles
+- Servidor Apache HTTP
+- PHP 7.4+ con soporte para PostgreSQL
+- Archivos de la aplicación web copiados a /var/www/html/
+- Permisos y configuración de seguridad
+- Servicio iniciado y habilitado al arranque
 
-#### 1. provision-web.sh
-**Propósito:** Configura el servidor web con Apache y PHP.  
+### provision-db.sh (Servidor de Base de Datos)
 
-**Funcionalidades:**
-- Actualiza los paquetes del sistema.  
-- Instala Apache y PHP.  
-- Habilita e inicia el servicio Apache.  
-- Copia archivos del proyecto al directorio web.  
-- Configura permisos adecuados.  
+Configura automáticamente:
 
-**Uso:**
+- PostgreSQL 12+ con extensiones
+- Base de datos **mi_proyecto** creada
+- Usuario **admin_proyecto** con permisos completos
+- Tabla **usuarios** con datos de ejemplo
+- Configuración para conexiones remotas
+- Servicio iniciado y habilitado al arranque
+
+## Comandos Útiles
+
+### Gestión de Máquinas Virtuales
+
 ```bash
-chmod +x provision-web.sh
-sudo ./provision-web.sh
+# Ver estado de las máquinas
+vagrant status
+
+# Acceder a una máquina via SSH
+vagrant ssh web
+vagrant ssh db
+
+# Apagar las máquinas
+vagrant halt
+
+# Eliminar las máquinas
+vagrant destroy
+
+# Re-ejecutar provisionamiento
+vagrant provision web
+vagrant provision db
 ```
 
-#### 2. provision-db.sh
-**Propósito:** Instala y configura PostgreSQL.  
+### Verificación de Servicios
 
-**Funcionalidades:**
-- Instala PostgreSQL y componentes adicionales.  
-- Configura el servicio para inicio automático.  
-- Crea base de datos y usuario personalizados.  
-- Configura acceso remoto.  
-- Abre puerto 5432 en el firewall.  
-
-**Uso:**
 ```bash
-chmod +x provision-db.sh
-sudo ./provision-db.sh <nombre_bd> <usuario> <contraseña>
+# Desde la máquina web
+vagrant ssh web -c "sudo systemctl status apache2"
+
+# Desde la máquina de base de datos
+vagrant ssh db -c "sudo systemctl status postgresql"
 ```
 
-**Ejemplo:**
+### Probar Conexión a Base de Datos
+
 ```bash
-sudo ./provision-db.sh mi_proyecto admin_proyecto ContraseñaSegura123
+# Desde la máquina web
+vagrant ssh web -c "psql -h 192.168.56.4 -U admin_proyecto -d mi_proyecto -c 'SELECT * FROM usuarios;'"
 ```
 
-**Parámetros requeridos:**
-- nombre_bd: Nombre de la base de datos.  
-- usuario: Usuario de la base de datos.  
-- contraseña: Contraseña del usuario.  
+## Características de la Aplicación
 
-#### 3. setup-simple-table.sh
-**Propósito:** Crea estructura básica de datos con tabla de ejemplo.  
+### Página Principal (index.php)
 
-**Funcionalidades:**
-- Crea tabla `usuarios` con estructura básica.  
-- Inserta datos genéricos de ejemplo.  
-- Muestra confirmación de los datos insertados.  
+- Información del servidor web
+- Estado de los servicios
+- Enlaces a las diferentes funcionalidades
 
-**Uso:**
-```bash
-chmod +x setup-simple-table.sh
-sudo ./setup-simple-table.sh <nombre_bd> <usuario> <contraseña>
-```
+### Formulario de Conexión a BD (consulta-bd.php)
 
-**Ejemplo:**
-```bash
-sudo ./setup-simple-table.sh mi_proyecto admin_proyecto ContraseñaSegura123
-```
+- Interfaz web para conectar a PostgreSQL
+- Formulario con valores preconfigurados
+- Visualización de tablas y datos en tiempo real
+- Manejo de errores con sugerencias de solución
 
-**Parámetros requeridos:**
-- nombre_bd: Mismo nombre usado en `provision-db.sh`.  
-- usuario: Mismo usuario usado en `provision-db.sh`.  
-- contraseña: Misma contraseña usada en `provision-db.sh`.  
+### Base de Datos
 
-### Flujo Completo de Ejecución
-```bash
-# 1. Configurar servidor web
-sudo ./provision-web.sh
-
-# 2. Configurar base de datos
-sudo ./provision-db.sh mi_proyecto admin_proyecto MiContraseñaSegura
-
-# 3. Crear estructura de datos
-sudo ./setup-simple-table.sh mi_proyecto admin_proyecto MiContraseñaSegura
-```
-
-### Notas Importantes
-- Ejecutar los scripts en orden secuencial.  
-- No hay valores por defecto para contraseñas.  
-- Usar los mismos credenciales en `provision-db.sh` y `setup-simple-table.sh`.  
-- Los scripts requieren permisos de superusuario (`sudo`).  
+- Tabla **usuarios** con estructura básica
+- Cinco registros de ejemplo precargados
+- Permisos configurados para acceso remoto
+- Configurada para aceptar conexiones desde la red privada
