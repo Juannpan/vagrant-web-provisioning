@@ -23,9 +23,15 @@ proyecto/
 ├── Vagrantfile              # Configuración de las máquinas virtuales
 ├── provision-web.sh         # Script de provisionamiento del servidor web
 ├── provision-db.sh          # Script de provisionamiento de la base de datos
-├── www/                     # Archivos de la aplicación web
-│   ├── index.php            # Página principal
-│   └── consulta-bd.php      # Formulario de conexión a BD
+├── www/                     # Página web y conexión a la base de datos
+│   ├── fuentes              # Recursos diseño página web
+│   ├── gifs                 # Recursos diseño página web
+│   ├── img                  # Recursos diseño página web
+│   ├── js/                  # Animaciones y redireccionamiento
+│   │    ├── code.js         # Lógica de animaciones y redireccionamiento            
+│   ├── sonidos              # recursos no utilizados               
+│   ├── index.php            # Página principal 
+│   └── info.php      # Formulario de conexión a BD
 └── README.md                # Este archivo
 ```
 
@@ -61,7 +67,7 @@ http://192.168.56.3
 
 ### Formulario de Conexión a Base de Datos
 ```
-http://192.168.56.3/consulta-bd.php
+http://192.168.56.3/info.php
 ```
 
 ### Credenciales de Base de Datos
@@ -69,7 +75,7 @@ http://192.168.56.3/consulta-bd.php
 - Servidor: 192.168.56.4
 - Base de datos: mi_proyecto
 - Usuario: admin_proyecto
-- Contraseña: ContraseñaSegura123
+- Contraseña: contraseñasegura123
 
 ## Scripts de Provisionamiento
 
@@ -142,7 +148,7 @@ vagrant ssh web -c "psql -h 192.168.56.4 -U admin_proyecto -d mi_proyecto -c 'SE
 - Estado de los servicios
 - Enlaces a las diferentes funcionalidades
 
-### Formulario de Conexión a BD (consulta-bd.php)
+### Formulario de Conexión a BD (info.php)
 
 - Interfaz web para conectar a PostgreSQL
 - Formulario con valores preconfigurados
